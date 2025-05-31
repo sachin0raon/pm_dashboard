@@ -14,29 +14,29 @@ class Database:
         self.database = database
         self.influx_manually_started = False
 
-        self.client = InfluxDBClient(host='localhost', port=8086)
+        self.client = InfluxDBClient(host='localhost', port=8086, username="root", password="password")
     
     def set_debug_level(self, level):
         self.log.info(f"Setting debug level to {level}")
         self.log.setLevel(level)
 
     def start(self):
-        if not Database.is_influxdb_running():
-            self.log.info("Starting influxdb service")
-            self.start_influxdb()
-            # Wait 2 seconds for InfluxDB to start
-            time.sleep(2)
+        # if not Database.is_influxdb_running():
+        #     self.log.info("Starting influxdb service")
+        #     self.start_influxdb()
+        #     # Wait 2 seconds for InfluxDB to start
+        #     time.sleep(2)
 
-        self.log.debug("Waiting for InfluxDB to be ready")
-        for _ in range(10):
-            if self.is_ready():
-                self.log.info("Influxdb is ready")
-                break
-            else:
-                time.sleep(1)
-        else:
-            self.log.error("Timeout waiting for InfluxDB to be ready")
-            return False
+        # self.log.debug("Waiting for InfluxDB to be ready")
+        # for _ in range(10):
+        #     if self.is_ready():
+        #         self.log.info("Influxdb is ready")
+        #         break
+        #     else:
+        #         time.sleep(1)
+        # else:
+        #     self.log.error("Timeout waiting for InfluxDB to be ready")
+        #     return False
 
         databases = self.client.get_list_database()
         if not any(db['name'] == self.database for db in databases):
@@ -46,16 +46,17 @@ class Database:
         self.client.switch_database(self.database)
 
     def is_ready(self):
-        ports = Database.get_influxdb_ports()
-        if len(ports) == 0:
-            self.log.error("Influxdb process error, no ports found")
-            return False
-        if len(ports) == 1:
-            self.log.info(f"Influxdb process error, only running on port {ports[0]}")
-        try:
-            return self.client.ping()
-        except Exception as e:
-            return False
+        return True
+        # ports = Database.get_influxdb_ports()
+        # if len(ports) == 0:
+        #     self.log.error("Influxdb process error, no ports found")
+        #     return False
+        # if len(ports) == 1:
+        #     self.log.info(f"Influxdb process error, only running on port {ports[0]}")
+        # try:
+        #     return self.client.ping()
+        # except Exception as e:
+        #     return False
 
     @staticmethod
     def is_influxdb_running():
@@ -84,7 +85,8 @@ class Database:
         self.influx_manually_started = True
 
     def stop_influxdb(self):
-        subprocess.Popen(["pkill", "influxd"])
+        pass
+        # subprocess.Popen(["pkill", "influxd"])
 
     def set(self, measurement, data):
         # self.log.debug(f"Setting data to database: measurement={measurement}, data={data}")
