@@ -31,7 +31,7 @@ class DataLogger:
         self.log = get_logger(__name__)
 
         try:
-            self.client = InfluxDBClient(host='localhost', port=8086)
+            self.client = InfluxDBClient(host='localhost', port=8086, username="root", password="password")
         except Exception as e:
             self.log.error(f"Failed to connect to influxdb: {e}")
             return

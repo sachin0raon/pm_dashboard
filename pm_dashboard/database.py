@@ -38,12 +38,15 @@ class Database:
         #     self.log.error("Timeout waiting for InfluxDB to be ready")
         #     return False
 
-        databases = self.client.get_list_database()
-        if not any(db['name'] == self.database for db in databases):
-            self.client.create_database(self.database)
-            self.log.info(f"Database '{self.database}' created successfully")
+        try:
+            databases = self.client.get_list_database()
+            if not any(db['name'] == self.database for db in databases):
+                self.client.create_database(self.database)
+                self.log.info(f"Database '{self.database}' created successfully")
 
-        self.client.switch_database(self.database)
+            self.client.switch_database(self.database)
+        except InfluxDBClientError as e:
+            self.log.error(json.loads(e.content)["error"])
 
     def is_ready(self):
         return True
